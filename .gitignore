@@ -1,7 +1,4 @@
-# Çıktı ve Log dosyalarını yoksay
 outputs/
 logs/
 tarama_raporu.txt
-
-# Derlenmiş dosyaları yoksay
 *.exe

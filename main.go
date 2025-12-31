@@ -25,6 +25,8 @@ func main() {
 	allocCtx, cancel := tarayıcıAyar()
 	defer cancel()
 
+	ipKontrol(allocCtx)
+
 	sonuclar := make(map[string]string)
 
 	for _, url := range hedeflerim {
@@ -115,4 +117,29 @@ func Raporla(sonuclar map[string]string) {
 		f.WriteString(fmt.Sprintf("[%s] %s\n", durum, url))
 	}
 	fmt.Println("\n[+] Rapor 'tarama_raporu.txt' dosyasına kaydedildi.")
+}
+
+func ipKontrol(ctx context.Context) {
+	fmt.Println("[INFO] Tor bağlantısı ve IP adresi kontrol ediliyor...")
+
+	tCtx, cancel := chromedp.NewContext(ctx)
+	tCtx, cancel = context.WithTimeout(tCtx, 60*time.Second)
+	defer cancel()
+
+	var baslik, ip string
+	err := chromedp.Run(tCtx,
+		chromedp.Navigate("https://check.torproject.org"),
+		chromedp.Text("h1", &baslik),
+		chromedp.Text("strong", &ip),
+	)
+
+	if err != nil {
+		fmt.Printf("[UYARI] IP kontrolü yapılamadı: %v\n", err)
+		return
+	}
+
+	fmt.Printf("\n=== TOR BAĞLANTI KONTROLÜ ===\n")
+	fmt.Printf("Mesaj: %s\n", strings.TrimSpace(baslik))
+	fmt.Printf("IP Adresiniz: %s\n", strings.TrimSpace(ip))
+	fmt.Printf("=============================\n\n")
 }
